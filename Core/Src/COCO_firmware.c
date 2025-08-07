@@ -303,6 +303,17 @@ uint16_t Send_CAN_Joint_Pos(Speed_Joint_Data *typedef_SJ_data, int joint_number)
 			return 1<<14;
 	}
 
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&typedef_SJ_data->hcan1) < 2) {
+		HAL_CAN_Init(&typedef_SJ_data->hcan1);
+		HAL_CAN_Start(&typedef_SJ_data->hcan1);
+	}
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&typedef_SJ_data->hcan2) < 2) {
+		HAL_CAN_Init(&typedef_SJ_data->hcan2);
+		HAL_CAN_Start(&typedef_SJ_data->hcan2);
+	}
+
 	return 0;
 }
 
@@ -354,6 +365,20 @@ uint8_t Send_CAN_Wheel_Speed(Speed_Joint_Data *typedef_SJ_data , int wheel_numbe
 
 		default:
 			return 1<<6;
+	}
+
+           //문제가 발생할 여지가 있어서 임시방편. 무슨 문제라고 하는데 해결하기 위한 근본적인 해결을 할 방법을 못 찾아서... 실제로 전송되면 될 수 있다함
+           // 근데 오버헤드가 너무 큼. 내가 원하는 부분만을 초기화 하는걸로 합시다
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&typedef_SJ_data->hcan1) < 2) {
+	    HAL_CAN_Init(&typedef_SJ_data->hcan1);
+	    HAL_CAN_Start(&typedef_SJ_data->hcan1);
+	}
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&typedef_SJ_data->hcan2) < 2) {
+	    HAL_CAN_Init(&typedef_SJ_data->hcan2);
+	    HAL_CAN_Start(&typedef_SJ_data->hcan2);
+
+	    //캔 스타트 함수는 크게 상관없는거 같긴 한데
 	}
 
 	return 0;
@@ -506,6 +531,16 @@ int16_t ReWrite_Send_CAN_Joint_Pos(Speed_Joint_Data *typedef_SJ_data , int joint
 		}
 
 
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&typedef_SJ_data->hcan1) < 2) {
+		HAL_CAN_Init(&typedef_SJ_data->hcan1);
+		HAL_CAN_Start(&typedef_SJ_data->hcan1);
+	}
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&typedef_SJ_data->hcan2) < 2) {
+		HAL_CAN_Init(&typedef_SJ_data->hcan2);
+		HAL_CAN_Start(&typedef_SJ_data->hcan2);
+	}
+
 	return 0;
 }
 
@@ -564,6 +599,18 @@ uint8_t ReWrite_Send_CAN_Wheel_Speed(Speed_Joint_Data *typedef_SJ_data , int whe
 			return 1<<6;
 	}
 
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&typedef_SJ_data->hcan1) < 2) {
+		HAL_CAN_Init(&typedef_SJ_data->hcan1);
+		HAL_CAN_Start(&typedef_SJ_data->hcan1);
+	}
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&typedef_SJ_data->hcan2) < 2) {
+		HAL_CAN_Init(&typedef_SJ_data->hcan2);
+		HAL_CAN_Start(&typedef_SJ_data->hcan2);
+	}
+
+
 	return 0;
 }
 
@@ -591,16 +638,16 @@ void Send_Data_CAN(Speed_Joint_Data *typedef_SJ_data){
 	speed_failer_handler |= Send_CAN_Wheel_Speed(typedef_SJ_data, CAN_ID_RIGHT_FRONT_WHEEL);
 	speed_failer_handler |= Send_CAN_Wheel_Speed(typedef_SJ_data, CAN_ID_RIGHT_REAR_WHEEL);
 
-	if(joint_failer_handler){
+	if(joint_failer_handler){              // if(joint_failer_handler != 0)
 
-		for(uint8_t i=0; i<12; i++){
-			((joint_failer_handler && 1<<i)>>i) ? Send_CAN_Joint_Pos(typedef_SJ_data, (0x0A+i)<<5) : 0 ;
+		for(uint8_t i=0; i<12; i++){if(speed_failer_handler)
+			((joint_failer_handler >>i)&1) ? Send_CAN_Joint_Pos(typedef_SJ_data, (0x0A+i)<<5) : 0 ;
 		}
 	}
 
-	if(speed_failer_handler){
+	if(speed_failer_handler){               // if(speed_failer_handler != 0)
 		for(uint8_t i=0; i<12; i++){
-			((speed_failer_handler && 1<<i)>>i) ? Send_CAN_Wheel_Speed(typedef_SJ_data, (0x16+i)<<5) : 0 ;
+			((speed_failer_handler >>i)&1) ? Send_CAN_Wheel_Speed(typedef_SJ_data, (0x16+i)<<5) : 0 ;
 		}
 	}
 
@@ -623,84 +670,84 @@ void init_helper(Speed_Joint_Data *typedef_SJ_data){
 	    init_handler.StdId = CAN_ID_LEFT_FRONT_KNEE|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
 	    		             , &init_handler, requestmode.data_8bit
-							 , &typedef_SJ_data->CAN1_MailBox); HAL_Delay(1);
+							 , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_LEFT_FRONT_HIP_AA|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
 	        		          , &init_handler, requestmode.data_8bit
-	    					  , &typedef_SJ_data->CAN1_MailBox); HAL_Delay(1);
+	    					  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_LEFT_FRONT_HIP_FE|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
 	            		      , &init_handler, requestmode.data_8bit
-	        				  , &typedef_SJ_data->CAN1_MailBox); HAL_Delay(1);
+	        				  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_RIGHT_FRONT_KNEE|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
 	                		  , &init_handler, requestmode.data_8bit
-	            			  , &typedef_SJ_data->CAN1_MailBox); HAL_Delay(1);
+	            			  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_RIGHT_FRONT_HIP_AA|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
 	                          , &init_handler, requestmode.data_8bit
-	                		  , &typedef_SJ_data->CAN1_MailBox); HAL_Delay(1);
+	                		  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_RIGHT_FRONT_HIP_FE|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
 	                    	  , &init_handler, requestmode.data_8bit
-	                		  , &typedef_SJ_data->CAN1_MailBox); HAL_Delay(1);
+	                		  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_LEFT_FRONT_WHEEL|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
 	                          , &init_handler, requestmode.data_8bit
-	                    	  , &typedef_SJ_data->CAN1_MailBox); HAL_Delay(1);
+	                    	  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_RIGHT_FRONT_WHEEL|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
 	                		  , &init_handler, requestmode.data_8bit
-	            			  , &typedef_SJ_data->CAN1_MailBox); HAL_Delay(1);
+	            			  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
 
 	    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 	    init_handler.StdId = CAN_ID_LEFT_REAR_KNEE|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
 	    		             , &init_handler, requestmode.data_8bit
-							 , &typedef_SJ_data->CAN2_MailBox); HAL_Delay(1);
+							 , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_LEFT_REAR_HIP_AA|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
 	        		          , &init_handler, requestmode.data_8bit
-	    					  , &typedef_SJ_data->CAN2_MailBox); HAL_Delay(1);
+	    					  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_LEFT_REAR_HIP_FE|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
 	            		      , &init_handler, requestmode.data_8bit
-	        				  , &typedef_SJ_data->CAN2_MailBox); HAL_Delay(1);
+	        				  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_RIGHT_REAR_KNEE|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
 	                		  , &init_handler, requestmode.data_8bit
-	            			  , &typedef_SJ_data->CAN2_MailBox); HAL_Delay(1);
+	            			  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_RIGHT_REAR_HIP_AA|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
 	                          , &init_handler, requestmode.data_8bit
-	                		  , &typedef_SJ_data->CAN2_MailBox); HAL_Delay(1);
+	                		  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_RIGHT_REAR_HIP_FE|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
 	                    	  , &init_handler, requestmode.data_8bit
-	                		  , &typedef_SJ_data->CAN2_MailBox); HAL_Delay(1);
+	                		  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_LEFT_REAR_WHEEL|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
 	                          , &init_handler, requestmode.data_8bit
-	                    	  , &typedef_SJ_data->CAN2_MailBox); HAL_Delay(1);
+	                    	  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
 
 	    init_handler.StdId = CAN_ID_RIGHT_REAR_WHEEL|Set_Axis_Requested_State;
 	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
 	                		  , &init_handler, requestmode.data_8bit
-	            			  , &typedef_SJ_data->CAN2_MailBox); HAL_Delay(1);
+	            			  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
 
 	                                                                       //앞으로는 이렇게 살지 말자...
 

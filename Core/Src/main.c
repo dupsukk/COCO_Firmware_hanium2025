@@ -132,9 +132,10 @@ int main(void)
 
 
   UART_Buffer_init(&SJ_Data, &hcan1, &hcan2);          //버퍼 초기화 실시
-  Move_To_defalt_pos(&SJ_Data);        //디폴트 상태로 이동 실시
 
-  ODrive_CAN_init();                  // 이 이후로 코드를 작성하면 인터럽트가 괴롭힐 수 있으니까 초기화가 필요하다면 이 코드 이전에 끝내기
+  ODrive_CAN_init();
+
+  Move_To_defalt_pos(&SJ_Data);        //디폴트 상태로 이동 실시
 
   HAL_UART_Receive_IT(&huart2, SJ_Data.uart_rxBuffer , 16);    //16바이트의 정보가 들어오면 인터럽트 실시
 
@@ -149,6 +150,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+		Send_Data_CAN(&SJ_Data);
 
     /* USER CODE BEGIN 3 */
   }
