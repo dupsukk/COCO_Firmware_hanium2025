@@ -216,6 +216,10 @@ uint8_t ReWrite_Send_CAN_Wheel_Speed(Speed_Joint_Data *typedef_SJ_data , int whe
 
 void Send_Data_CAN(Speed_Joint_Data *typedef_SJ_data);
 
+void Send_Reqest_state_init_Message_CAN(CAN_HandleTypeDef *hcan , uint16_t CAN_ID );
+
+void Send_Controlmode_init_Message_CAN(CAN_HandleTypeDef *hcan , uint16_t CAN_ID);
+
 
 
 #endif /* INC_COCO_FIRMWARE_H_ */

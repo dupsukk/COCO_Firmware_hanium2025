@@ -640,7 +640,8 @@ void Send_Data_CAN(Speed_Joint_Data *typedef_SJ_data){
 
 	if(joint_failer_handler){              // if(joint_failer_handler != 0)
 
-		for(uint8_t i=0; i<12; i++){if(speed_failer_handler)
+		for(uint8_t i=0; i<12; i++){
+			//if(joint_failer_handler)
 			((joint_failer_handler >>i)&1) ? Send_CAN_Joint_Pos(typedef_SJ_data, (0x0A+i)<<5) : 0 ;
 		}
 	}
@@ -657,190 +658,98 @@ void Send_Data_CAN(Speed_Joint_Data *typedef_SJ_data){
 
 
 void init_helper(Speed_Joint_Data *typedef_SJ_data){
-	 CAN_TxHeaderTypeDef init_handler;
+	HAL_CAN_Init(&typedef_SJ_data->hcan1);
+	HAL_CAN_Start(&typedef_SJ_data->hcan1);
 
-	    Reqest_state_init_buffer requestmode;
-	    requestmode.commandsize = 8;               // 이 부분도 매크로 처리하거나 하자 << 그리고 변수이름도 잘못지음 걍 커맨드임 사이즈같은거 아님
-
-	    init_handler.IDE = CAN_ID_STD;
-	    init_handler.RTR = CAN_RTR_DATA;
-	    init_handler.DLC =4;
-
-	    //개노가다 오반데;;; 반복문 쓰고싶다...
-	    init_handler.StdId = CAN_ID_LEFT_FRONT_KNEE|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	    		             , &init_handler, requestmode.data_8bit
-							 , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_LEFT_FRONT_HIP_AA|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	        		          , &init_handler, requestmode.data_8bit
-	    					  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_LEFT_FRONT_HIP_FE|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	            		      , &init_handler, requestmode.data_8bit
-	        				  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_RIGHT_FRONT_KNEE|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                		  , &init_handler, requestmode.data_8bit
-	            			  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_RIGHT_FRONT_HIP_AA|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                          , &init_handler, requestmode.data_8bit
-	                		  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_RIGHT_FRONT_HIP_FE|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                    	  , &init_handler, requestmode.data_8bit
-	                		  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_LEFT_FRONT_WHEEL|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                          , &init_handler, requestmode.data_8bit
-	                    	  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_RIGHT_FRONT_WHEEL|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                		  , &init_handler, requestmode.data_8bit
-	            			  , &typedef_SJ_data->CAN1_MailBox); //HAL_Delay(1);
-
-	    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-	    init_handler.StdId = CAN_ID_LEFT_REAR_KNEE|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	    		             , &init_handler, requestmode.data_8bit
-							 , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_LEFT_REAR_HIP_AA|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	        		          , &init_handler, requestmode.data_8bit
-	    					  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_LEFT_REAR_HIP_FE|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	            		      , &init_handler, requestmode.data_8bit
-	        				  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_RIGHT_REAR_KNEE|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                		  , &init_handler, requestmode.data_8bit
-	            			  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_RIGHT_REAR_HIP_AA|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                          , &init_handler, requestmode.data_8bit
-	                		  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_RIGHT_REAR_HIP_FE|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                    	  , &init_handler, requestmode.data_8bit
-	                		  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_LEFT_REAR_WHEEL|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                          , &init_handler, requestmode.data_8bit
-	                    	  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
-
-	    init_handler.StdId = CAN_ID_RIGHT_REAR_WHEEL|Set_Axis_Requested_State;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                		  , &init_handler, requestmode.data_8bit
-	            			  , &typedef_SJ_data->CAN2_MailBox); //HAL_Delay(1);
-
-	                                                                       //앞으로는 이렇게 살지 말자...
-
-	    Controller_mode_init_buffer controlmode;
-	    controlmode.data_32bit[0] = 3;
-	    controlmode.data_32bit[1] = 2;
+	HAL_CAN_Init(&typedef_SJ_data->hcan2);
+	HAL_CAN_Start(&typedef_SJ_data->hcan2);
 
 
-	    init_handler.IDE = CAN_ID_STD;
-	    init_handler.RTR = CAN_RTR_DATA;
-	    init_handler.DLC =8;
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_LEFT_FRONT_KNEE);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_LEFT_FRONT_HIP_AA);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_LEFT_FRONT_HIP_FE);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan1,  CAN_ID_RIGHT_FRONT_KNEE );
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_RIGHT_FRONT_HIP_AA);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_RIGHT_FRONT_HIP_FE);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_LEFT_FRONT_WHEEL);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_RIGHT_FRONT_WHEEL);
+
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_LEFT_REAR_KNEE);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_LEFT_REAR_HIP_AA );
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_LEFT_REAR_HIP_FE);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_RIGHT_REAR_KNEE );
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_RIGHT_REAR_HIP_AA);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_RIGHT_REAR_HIP_FE);
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_LEFT_REAR_WHEEL );
+	Send_Reqest_state_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_RIGHT_REAR_WHEEL);
 
 
-	    init_handler.StdId = CAN_ID_LEFT_FRONT_KNEE|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	    		             , &init_handler, controlmode.data_8bit
-							 , &typedef_SJ_data->CAN1_MailBox);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_LEFT_FRONT_KNEE);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_LEFT_FRONT_HIP_AA);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_LEFT_FRONT_HIP_FE);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan1,  CAN_ID_RIGHT_FRONT_KNEE );
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_RIGHT_FRONT_HIP_AA);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_RIGHT_FRONT_HIP_FE);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_LEFT_FRONT_WHEEL);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan1, CAN_ID_RIGHT_FRONT_WHEEL);
 
-	    init_handler.StdId = CAN_ID_LEFT_FRONT_HIP_AA|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	        		          , &init_handler, controlmode.data_8bit
-	    					  , &typedef_SJ_data->CAN1_MailBox);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_LEFT_REAR_KNEE);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_LEFT_REAR_HIP_AA );
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_LEFT_REAR_HIP_FE);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_RIGHT_REAR_KNEE );
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_RIGHT_REAR_HIP_AA);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_RIGHT_REAR_HIP_FE);
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_LEFT_REAR_WHEEL );
+	Send_Controlmode_init_Message_CAN(&typedef_SJ_data->hcan2, CAN_ID_RIGHT_REAR_WHEEL);
 
-	    init_handler.StdId = CAN_ID_LEFT_FRONT_HIP_FE|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	            		      , &init_handler, controlmode.data_8bit
-	        				  , &typedef_SJ_data->CAN1_MailBox);
+}
 
-	    init_handler.StdId = CAN_ID_RIGHT_FRONT_KNEE|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                		  , &init_handler, controlmode.data_8bit
-	            			  , &typedef_SJ_data->CAN1_MailBox);
 
-	    init_handler.StdId = CAN_ID_RIGHT_FRONT_HIP_AA|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                          , &init_handler, controlmode.data_8bit
-	                		  , &typedef_SJ_data->CAN1_MailBox);
 
-	    init_handler.StdId = CAN_ID_RIGHT_FRONT_HIP_FE|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                    	  , &init_handler, controlmode.data_8bit
-	                		  , &typedef_SJ_data->CAN1_MailBox);
+void Send_Reqest_state_init_Message_CAN(CAN_HandleTypeDef *hcan , uint16_t CAN_ID ){
+	uint32_t MailBox;
 
-	    init_handler.StdId = CAN_ID_LEFT_FRONT_WHEEL|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                          , &init_handler, controlmode.data_8bit
-	                    	  , &typedef_SJ_data->CAN1_MailBox);
+	Reqest_state_init_buffer requestmode;
+	CAN_TxHeaderTypeDef init_handler;
+	requestmode.commandsize = 8;               // 이 부분도 매크로 처리하거나 하자 << 그리고 변수이름도 잘못지음 걍 커맨드임 사이즈같은거 아님
+	                                                      //8이 바로 클로즈 루프 스테이트
+	init_handler.IDE = CAN_ID_STD;
+	init_handler.RTR = CAN_RTR_DATA;
+	init_handler.DLC =4;
 
-	    init_handler.StdId = CAN_ID_RIGHT_FRONT_WHEEL|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan1
-	                		  , &init_handler, controlmode.data_8bit
-	            			  , &typedef_SJ_data->CAN1_MailBox);
+	init_handler.StdId = CAN_ID|Set_Axis_Requested_State;
+	HAL_CAN_AddTxMessage(hcan , &init_handler, requestmode.data_8bit, &MailBox);
 
-	    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-	    init_handler.StdId = CAN_ID_LEFT_REAR_KNEE|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	    		             , &init_handler, controlmode.data_8bit
-							 , &typedef_SJ_data->CAN1_MailBox);
+	if(HAL_CAN_GetTxMailboxesFreeLevel(hcan) < 2) {
+		HAL_CAN_Init(hcan);
+		HAL_CAN_AddTxMessage(hcan , &init_handler, requestmode.data_8bit, &MailBox);
 
-	    init_handler.StdId = CAN_ID_LEFT_REAR_HIP_AA|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	        		          , &init_handler, controlmode.data_8bit
-	    					  , &typedef_SJ_data->CAN1_MailBox);
+	}
+}
 
-	    init_handler.StdId = CAN_ID_LEFT_REAR_HIP_FE|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	            		      , &init_handler, controlmode.data_8bit
-	        				  , &typedef_SJ_data->CAN1_MailBox);
 
-	    init_handler.StdId = CAN_ID_RIGHT_REAR_KNEE|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                		  , &init_handler, controlmode.data_8bit
-	            			  , &typedef_SJ_data->CAN1_MailBox);
 
-	    init_handler.StdId = CAN_ID_RIGHT_REAR_HIP_AA|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                          , &init_handler, controlmode.data_8bit
-	                		  , &typedef_SJ_data->CAN1_MailBox);
+void Send_Controlmode_init_Message_CAN(CAN_HandleTypeDef *hcan , uint16_t CAN_ID){
+	uint32_t MailBox;
 
-	    init_handler.StdId = CAN_ID_RIGHT_REAR_HIP_FE|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                    	  , &init_handler, controlmode.data_8bit
-	                		  , &typedef_SJ_data->CAN1_MailBox);
+	Controller_mode_init_buffer controlmode;
+	controlmode.data_32bit[0] = 3;
+	controlmode.data_32bit[1] = 2;
+	CAN_TxHeaderTypeDef init_handler;
 
-	    init_handler.StdId = CAN_ID_LEFT_REAR_WHEEL|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                          , &init_handler, controlmode.data_8bit
-	                    	  , &typedef_SJ_data->CAN1_MailBox);
+	init_handler.IDE = CAN_ID_STD;
+	init_handler.RTR = CAN_RTR_DATA;
+	init_handler.DLC =8;
 
-	    init_handler.StdId = CAN_ID_RIGHT_REAR_WHEEL|Set_Controller_Modes;
-	    HAL_CAN_AddTxMessage(&typedef_SJ_data->hcan2
-	                		  , &init_handler, controlmode.data_8bit
-	            			  , &typedef_SJ_data->CAN1_MailBox);
+	init_handler.StdId = CAN_ID|Set_Controller_Modes;
+	HAL_CAN_AddTxMessage(hcan , &init_handler, controlmode.data_8bit, &MailBox);
+
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(hcan) < 2) {
+		HAL_CAN_Init(hcan);
+		HAL_CAN_AddTxMessage(hcan , &init_handler, controlmode.data_8bit, &MailBox);
+
+	}
 }
 
